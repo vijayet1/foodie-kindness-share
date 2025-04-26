@@ -1,92 +1,48 @@
 
-import { Search } from "lucide-react";
-import FoodItem from "@/components/FoodItem";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-
-// Sample food data
-const foodItems = [
-  {
-    id: "1",
-    title: "Homemade Pasta",
-    description: "Fresh homemade pasta made today. Can't finish it all, happy to share!",
-    location: "Downtown",
-    distance: "0.5 miles",
-    timePosted: "Posted 35 min ago",
-    imageUrl: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80",
-  },
-  {
-    id: "2",
-    title: "Fresh Vegetables",
-    description: "Organic vegetables from my garden. Too many for me to use!",
-    location: "Westside",
-    distance: "1.2 miles",
-    timePosted: "Posted 2 hours ago",
-    imageUrl: "https://images.unsplash.com/photo-1607305387299-a3d9611cd469?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
-  },
-  {
-    id: "3",
-    title: "Leftover Birthday Cake",
-    description: "Half a chocolate birthday cake left over from party. Still very fresh!",
-    location: "Northside",
-    distance: "1.8 miles",
-    timePosted: "Posted 5 hours ago",
-    imageUrl: "https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1050&q=80",
-  },
-];
 
 const Index = () => {
   return (
-    <div className="pb-20 max-w-md mx-auto">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-background pt-6 pb-4 px-4">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">
-            <span className="text-foodie-green">Foodie</span>
-            <span className="text-foodie-orange">Share</span>
-          </h1>
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-              <Search size={18} className="text-gray-500" />
-            </div>
-          </div>
-        </div>
-        
-        {/* Filter Chips */}
-        <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-          <div className="bg-foodie-green/10 text-foodie-green px-3 py-1 rounded-full whitespace-nowrap text-sm">
-            All Items
-          </div>
-          <div className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full whitespace-nowrap text-sm">
-            Nearby
-          </div>
-          <div className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full whitespace-nowrap text-sm">
-            Vegetables
-          </div>
-          <div className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full whitespace-nowrap text-sm">
-            Fruits
-          </div>
-          <div className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full whitespace-nowrap text-sm">
-            Prepared Food
-          </div>
-        </div>
+    <div className="min-h-screen bg-sage-50 px-4 py-8">
+      {/* Logo and Hero Section */}
+      <div className="mb-12 text-center">
+        <img 
+          src="/lovable-uploads/679b37d8-2141-421a-aa60-c93599b3bfba.png" 
+          alt="EcoEats Logo" 
+          className="h-20 mx-auto mb-8"
+        />
+        <h1 className="text-3xl font-bold mb-4">
+          <span className="text-eco-green">Share</span> More,
+          <br />
+          <span className="text-eco-light-green">Waste</span> Less
+        </h1>
+        <p className="text-gray-600 max-w-sm mx-auto">
+          Connect with your community to share surplus food, reduce waste, 
+          and help those in need. Let's make it easy to find and share 
+          food in your neighborhood.
+        </p>
       </div>
-      
-      {/* Food Items */}
-      <div className="px-4 pt-2">
-        {foodItems.map((item) => (
-          <FoodItem
-            key={item.id}
-            id={item.id}
-            title={item.title}
-            description={item.description}
-            location={item.location}
-            distance={item.distance}
-            timePosted={item.timePosted}
-            imageUrl={item.imageUrl}
-          />
-        ))}
+
+      {/* Auth Buttons */}
+      <div className="max-w-sm mx-auto space-y-4">
+        <Link 
+          to="/auth" 
+          className="block w-full bg-white text-gray-800 text-center py-3 rounded-xl border border-gray-200"
+        >
+          Login
+        </Link>
+        <Link 
+          to="/auth" 
+          className="block w-full bg-eco-green text-white text-center py-3 rounded-xl"
+        >
+          Sign Up
+        </Link>
+        <p className="text-sm text-center text-gray-500 mt-4">
+          Create new account
+        </p>
       </div>
-      
+
       <Navbar />
     </div>
   );
