@@ -88,7 +88,45 @@ const AddFood = () => {
         }
       }
 
-      // Save food listing
+      // First try to get user info to verify the user exists in the database
+      const { data: userData, error: userError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+
+      // If user doesn't exist in profiles table, try to create one
+      if (userError) {
+        console.log("User profile may not exist, attempting to ensure user exists");
+        try {
+          const { error: createProfileError } = await supabase
+            .from('profiles')
+            .upsert({
+              id: user.id,
+              email: user.email,
+              created_at: new Date().toISOString()
+            });
+
+          if (createProfileError) {
+            console.error("Error creating user profile:", createProfileError);
+            // Continue anyway, as the food_listings table might not have a foreign key constraint
+          }
+        } catch (profileErr) {
+          console.error("Failed to create profile:", profileErr);
+        }
+      }
+
+      // Save food listing with detailed debug information
+      console.log("Attempting to insert food listing with data:", {
+        user_id: user.id,
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        location: formData.location,
+        image_url: photoUrl || null,
+        status: 'available'
+      });
+
       const { error } = await supabase
         .from('food_listings')
         .insert({
@@ -101,7 +139,21 @@ const AddFood = () => {
           status: 'available'
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase insert error details:", error);
+
+        // Try to provide more specific error messages based on the error code
+        if (error.code === '42P01') {
+          toast.error("The food listings table doesn't exist in the database. Please set up your database first.");
+        } else if (error.code === '23505') {
+          toast.error("A similar food listing already exists.");
+        } else if (error.code === '23503') {
+          toast.error("Your user account is not properly set up. Please try logging out and in again.");
+        } else {
+          toast.error(`Database error: ${error.message || "Failed to create food listing"}`);
+        }
+        throw error;
+      }
 
       toast.success("Food listing created successfully!");
       navigate("/");
