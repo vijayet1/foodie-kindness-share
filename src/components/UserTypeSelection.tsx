@@ -24,7 +24,7 @@ const UserTypeSelection = ({ selectedType, onTypeSelect }: UserTypeSelectionProp
           <RadioGroupItem value="individual" id="individual" />
           <Label htmlFor="individual" className="flex flex-col cursor-pointer">
             <span className="font-semibold">Individual</span>
-            <span className="text-sm text-gray-500">Share homemade meals and reduce food waste</span>
+            <span className="text-sm text-gray-500">Share and consume food and reduce food waste</span>
           </Label>
         </div>
 
@@ -35,7 +35,7 @@ const UserTypeSelection = ({ selectedType, onTypeSelect }: UserTypeSelectionProp
           <RadioGroupItem value="orgs" id="orgs" />
           <Label htmlFor="orgs" className="flex flex-col cursor-pointer">
             <span className="font-semibold">Organizations</span>
-            <span className="text-sm text-gray-500">Find affordable meals and connect with peers</span>
+            <span className="text-sm text-gray-500">Eco-consious companies, who are willing to share access food.</span>
           </Label>
         </div>
 
