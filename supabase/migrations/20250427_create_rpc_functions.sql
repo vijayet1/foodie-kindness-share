@@ -8,11 +8,11 @@ DECLARE
   exists_val boolean;
 BEGIN
   SELECT EXISTS (
-    SELECT FROM information_schema.tables 
+    SELECT FROM information_schema.tables
     WHERE table_schema = 'public'
     AND table_name = $1
   ) INTO exists_val;
-  
+
   RETURN exists_val;
 END;
 $$;
@@ -45,10 +45,10 @@ BEGIN
 
     -- Add comments
     COMMENT ON TABLE public.food_listings IS 'Table for food listings that users can share';
-    
+
     -- Create RLS policies
     ALTER TABLE public.food_listings ENABLE ROW LEVEL SECURITY;
-    
+
     -- Policy for reading food listings (anyone can read)
     CREATE POLICY "Anyone can read food listings"
       ON public.food_listings
@@ -72,7 +72,7 @@ BEGIN
       ON public.food_listings
       FOR DELETE
       USING (auth.uid() = user_id);
-      
+
     RETURN true;
   ELSE
     RETURN false;
@@ -105,10 +105,10 @@ BEGIN
 
     -- Add comments
     COMMENT ON TABLE public.profiles IS 'Profile information for users';
-    
+
     -- Create RLS policies
     ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-    
+
     -- Policy for reading profiles (anyone can read)
     CREATE POLICY "Anyone can read profiles"
       ON public.profiles
@@ -120,13 +120,13 @@ BEGIN
       ON public.profiles
       FOR INSERT
       WITH CHECK (auth.uid() = id);
-      
+
     -- Policy for updating profiles (must be the profile owner)
     CREATE POLICY "Users can update their own profile"
       ON public.profiles
       FOR UPDATE
       USING (auth.uid() = id);
-      
+
     RETURN true;
   ELSE
     RETURN false;
