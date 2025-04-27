@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail } from "lucide-react";
@@ -38,7 +39,8 @@ const Auth = () => {
         });
         if (error) throw error;
       } else {
-        const { error } = await supabase.auth.signUp({
+        // Sign up flow
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -48,10 +50,14 @@ const Auth = () => {
             },
           },
         });
+        
         if (error) throw error;
-        //toast.success("Verification email sent! Please check your inbox.");
-        if (user) {
+        
+        // Check if data exists and has user property
+        if (data && data.user) {
           toast.success("Account created successfully! Verification bypassed for development.");
+        } else {
+          toast.success("Verification email sent! Please check your inbox.");
         }
       }
     } catch (error: any) {
