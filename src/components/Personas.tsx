@@ -1,38 +1,37 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const personas = [
   {
-    name: "Alice",
-    type: "Home Cook",
-    description: "An eco-conscious individual who values safety and simplicity in food sharing.",
+    name: "Emily",
+    type: "Individual",
+    description: "Share and consume food and reduce food waste.",
     traits: [
       "Values sustainability",
-      "Focuses on food safety",
+      "Focuses on minimizing food waste",
       "Prefers simple user experience",
       "Regular food sharer"
     ]
   },
   {
-    name: "Ben",
-    type: "Student",
-    description: "Budget-minded student looking for convenient ready-to-pickup meals.",
+    name: "Green Bites",
+    type: "Organizations",
+    description: "Eco-conscious companies willing to share excess food.",
     traits: [
-      "Cost-conscious",
-      "Seeks convenience",
-      "Flexible schedule",
-      "Quick response time"
+      "Handles large food volumes",
+      "Requires scheduling features",
+      "Seeks to reduce food waste",
+      "Collaborates with charities"
     ]
   },
   {
-    name: "Charity Organization",
-    type: "Non-profit",
-    description: "Organizations focused on bulk food collection and distribution to those in need.",
+    name: "Helping Hands",
+    type: "Charity Organizations",
+    description: "Handle bulk food collections and distributions.",
     traits: [
-      "Handles large quantities",
-      "Needs scheduling features",
-      "Requires reporting tools",
-      "Regular bulk pickups"
+      "Manages large-scale food distribution",
+      "Needs scheduling and reporting tools",
+      "Focuses on community impact",
+      "Works with donors and volunteers"
     ]
   }
 ];
