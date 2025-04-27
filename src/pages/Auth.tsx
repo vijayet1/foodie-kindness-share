@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ const Auth = () => {
   const [name, setName] = useState("");
   const [userType, setUserType] = useState<UserType>('individual'); // Updated initial userType to 'individual'
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +39,8 @@ const Auth = () => {
           password,
         });
         if (error) throw error;
+        toast.success("Logged in successfully!");
+        navigate('/');
       } else {
         // Sign up flow
         const { data, error } = await supabase.auth.signUp({
@@ -46,7 +49,7 @@ const Auth = () => {
           options: {
             data: {
               name,
-              user_type: userType, // Ensure userType is part of the signup data
+              user_type: userType,
             },
           },
         });
@@ -55,13 +58,27 @@ const Auth = () => {
         
         // Check if data exists and has user property
         if (data && data.user) {
-          toast.success("Account created successfully! Verification bypassed for development.");
+          toast.success("Account created successfully!");
+          
+          // Automatically sign in the user after successful registration
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+          
+          if (signInError) {
+            console.error("Auto-login failed:", signInError);
+            toast.error("Registration successful but auto-login failed. Please log in manually.");
+          } else {
+            navigate('/');
+          }
         } else {
           toast.success("Verification email sent! Please check your inbox.");
         }
       }
     } catch (error: any) {
       toast.error(error.message);
+      console.error("Authentication error:", error);
     } finally {
       setLoading(false);
     }
