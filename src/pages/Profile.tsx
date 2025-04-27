@@ -1,65 +1,39 @@
-import { Settings, Gift, Award } from "lucide-react";
+import { Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import Navbar from "@/components/Navbar";
 import UserAvatar from "@/components/UserAvatar";
+import Navbar from "@/components/Navbar";
+
+// User type labels for display
+const userTypeLabels = {
+  individual: "Individual",
+  orgs: "Organization",
+  charity_orgs: "Charity Organization"
+};
 
 const ProfileStats = () => {
-  const [stats, setStats] = useState({
-    shared: 0,
-    received: 0,
-    rating: 0
-  });
-
-  useEffect(() => {
-    setStats({
-      shared: 0,
-      received: 0,
-      rating: 0
-    });
-  }, []);
-
   return (
-    <div className="flex justify-around py-4 bg-white rounded-xl food-card-shadow">
+    <div className="grid grid-cols-3 gap-4 bg-white rounded-lg p-4 shadow-sm">
       <div className="text-center">
-        <p className="text-lg font-bold text-foodie-green">{stats.shared}</p>
+        <p className="text-2xl font-bold text-foodie-green">0</p>
         <p className="text-xs text-gray-500">Shared</p>
       </div>
-      <div className="text-center border-x border-gray-100 px-8">
-        <p className="text-lg font-bold text-foodie-orange">{stats.received}</p>
+      <div className="text-center border-x border-gray-100">
+        <p className="text-2xl font-bold text-foodie-orange">0</p>
         <p className="text-xs text-gray-500">Received</p>
       </div>
       <div className="text-center">
-        <p className="text-lg font-bold text-foodie-green">{stats.rating || "-"}</p>
-        <p className="text-xs text-gray-500">Rating</p>
-      </div>
-    </div>
-  );
-};
-
-const AchievementItem = ({ icon, title, description }: { 
-  icon: React.ReactNode, 
-  title: string, 
-  description: string 
-}) => {
-  return (
-    <div className="flex items-center space-x-3 p-3 bg-white rounded-lg food-card-shadow">
-      <div className="bg-foodie-cream p-2 rounded-full">
-        {icon}
-      </div>
-      <div>
-        <h4 className="font-medium text-sm">{title}</h4>
-        <p className="text-xs text-gray-500">{description}</p>
+        <p className="text-2xl font-bold text-foodie-brown">0</p>
+        <p className="text-xs text-gray-500">Points</p>
       </div>
     </div>
   );
 };
 
 const Profile = () => {
-  const { user, isLoading } = useAuth();
+  const { user, userType, isLoading } = useAuth();
   const navigate = useNavigate();
   
   const formatMemberSince = () => {
@@ -111,6 +85,11 @@ const Profile = () => {
             {user.user_metadata?.name || user.email?.split('@')[0] || "User"}
           </h2>
           <p className="text-gray-500 text-sm">{formatMemberSince()}</p>
+          <div className="mt-1 px-3 py-1 bg-eco-light-green/20 rounded-full">
+            <p className="text-xs text-eco-green font-medium">
+              {userTypeLabels[userType as keyof typeof userTypeLabels] || "User"}
+            </p>
+          </div>
         </div>
         
         {/* Stats */}
@@ -118,29 +97,30 @@ const Profile = () => {
         
         {/* Achievements */}
         <div className="mt-6">
-          <h3 className="font-semibold mb-3">Achievements</h3>
-          <div className="space-y-3">
-            <AchievementItem 
-              icon={<Gift className="text-foodie-orange" size={20} />}
-              title="New Member"
-              description="Welcome to Foodie Kindness Share!"
-            />
+          <h3 className="font-semibold mb-2">My Achievements</h3>
+          <div className="bg-white rounded-lg p-4 shadow-sm flex items-center">
+            <div className="bg-gray-100 rounded-full p-3 mr-3">
+              <span role="img" aria-label="trophy" className="text-xl">🏆</span>
+            </div>
+            <div>
+              <p className="font-medium">New Member</p>
+              <p className="text-sm text-gray-500">Joined the community</p>
+            </div>
           </div>
         </div>
         
-        {/* Menu Items */}
-        <div className="mt-6 space-y-3">
-          <div className="p-4 bg-white rounded-xl food-card-shadow">
-            <h3 className="font-semibold mb-2">Your Shared Items</h3>
-            <p className="text-sm text-gray-500">View and manage your shared food items</p>
+        {/* Activity */}
+        <div className="mt-6">
+          <h3 className="font-semibold mb-2">Recent Activity</h3>
+          <div className="bg-white rounded-lg p-4 shadow-sm text-center py-6">
+            <p className="text-gray-500">No recent activity</p>
+            <p className="text-sm text-gray-400 mt-1">Start sharing or claiming food</p>
           </div>
-          
-          <div className="p-4 bg-white rounded-xl food-card-shadow">
-            <h3 className="font-semibold mb-2">Your Received Items</h3>
-            <p className="text-sm text-gray-500">See the food items you've received</p>
-          </div>
-          
-          <div className="p-4 bg-white rounded-xl food-card-shadow">
+        </div>
+        
+        {/* Feedback & Reviews */}
+        <div className="mt-6">
+          <div className="bg-white rounded-lg p-4 shadow-sm">
             <h3 className="font-semibold mb-2">Feedback & Reviews</h3>
             <p className="text-sm text-gray-500">Your community reputation</p>
           </div>

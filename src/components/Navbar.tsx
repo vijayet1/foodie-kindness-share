@@ -37,7 +37,7 @@ const Navbar = () => {
             className={`flex flex-col items-center ${getActiveClass('/add-food')}`}
           >
             <PlusSquare size={24} />
-            <span className="text-xs mt-1">Share</span>
+            <span className="text-xs mt-1">Share Food</span>
           </Link>
         )}
 
