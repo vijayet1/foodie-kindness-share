@@ -53,15 +53,39 @@ const AddFood = () => {
 
       // Upload photo if available
       if (photo) {
-        const fileName = `${user.id}-${Date.now()}.${photo.name.split('.').pop()}`;
+        try {
+          const fileName = `${user.id}-${Date.now()}.${photo.name.split('.').pop()}`;
 
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('food-images')
-          .upload(fileName, photo);
+          // First, check if the bucket exists
+          const { data: buckets } = await supabase.storage.listBuckets();
+          const bucketExists = buckets?.some(bucket => bucket.name === 'food-images');
 
-        if (uploadError) throw uploadError;
+          // If bucket doesn't exist, create it
+          if (!bucketExists) {
+            const { error: createBucketError } = await supabase.storage.createBucket('food-images', {
+              public: true // Make the bucket public so images can be accessed
+            });
 
-        photoUrl = supabase.storage.from('food-images').getPublicUrl(fileName).data.publicUrl;
+            if (createBucketError) {
+              console.error("Error creating bucket:", createBucketError);
+              throw new Error("Couldn't create storage bucket");
+            }
+          }
+
+          // Now upload the file
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('food-images')
+            .upload(fileName, photo);
+
+          if (uploadError) throw uploadError;
+
+          // Get the public URL
+          photoUrl = supabase.storage.from('food-images').getPublicUrl(fileName).data.publicUrl;
+        } catch (uploadErr: any) {
+          console.error("Image upload error:", uploadErr);
+          // Continue without image if upload fails
+          toast.error("Image upload failed, continuing without image");
+        }
       }
 
       // Save food listing
