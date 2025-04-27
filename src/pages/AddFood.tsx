@@ -49,75 +49,120 @@ const AddFood = () => {
     setLoading(true);
 
     try {
+      // First, ensure the food_listings table exists by directly running SQL
+      try {
+        // Check if table exists with RPC
+        const { error: sqlError } = await supabase.rpc('check_table_exists', { table_name: 'food_listings' });
+        
+        if (sqlError) {
+          console.log("Creating food_listings table...");
+          // Create table via SQL if RPC fails (table likely doesn't exist)
+          const { error: createTableError } = await supabase.rpc('create_food_listings_table');
+          
+          if (createTableError) {
+            console.error("Failed to create table:", createTableError);
+            toast.error("Could not create database table. Please contact support.");
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (tableError) {
+        console.error("Error checking/creating table:", tableError);
+      }
+
       let photoUrl = "";
 
-      // Upload photo if available
+      // Upload photo if available - with enhanced error handling
       if (photo) {
         try {
-          const fileName = `${user.id}-${Date.now()}.${photo.name.split('.').pop()}`;
-
+          const fileName = `${user.id}-${Date.now()}-${photo.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+          
+          console.log("Checking storage buckets...");
           // First, check if the bucket exists
-          const { data: buckets } = await supabase.storage.listBuckets();
+          const { data: buckets, error: bucketListError } = await supabase.storage.listBuckets();
+          
+          if (bucketListError) {
+            console.error("Error listing buckets:", bucketListError);
+            throw new Error(`Error listing buckets: ${bucketListError.message}`);
+          }
+          
           const bucketExists = buckets?.some(bucket => bucket.name === 'food-images');
-
+          console.log("Bucket exists:", bucketExists);
+          
           // If bucket doesn't exist, create it
           if (!bucketExists) {
-            const { error: createBucketError } = await supabase.storage.createBucket('food-images', {
-              public: true // Make the bucket public so images can be accessed
+            console.log("Creating bucket 'food-images'...");
+            const { data: newBucket, error: createBucketError } = await supabase.storage.createBucket('food-images', {
+              public: true, // Make the bucket public so images can be accessed
+              fileSizeLimit: 1024 * 1024 * 2 // 2MB limit
             });
-
+            
             if (createBucketError) {
               console.error("Error creating bucket:", createBucketError);
-              throw new Error("Couldn't create storage bucket");
+              throw new Error(`Couldn't create storage bucket: ${createBucketError.message}`);
             }
+            
+            console.log("Bucket created:", newBucket);
+          }
+
+          // Create a public CORS policy for the bucket
+          try {
+            console.log("Setting bucket policy...");
+            await supabase.storage.updateBucket('food-images', {
+              public: true
+            });
+            console.log("Bucket policy set to public");
+          } catch (policyError) {
+            console.error("Error setting bucket policy:", policyError);
+            // Continue anyway
           }
 
           // Now upload the file
+          console.log("Uploading image...");
           const { data: uploadData, error: uploadError } = await supabase.storage
             .from('food-images')
-            .upload(fileName, photo);
+            .upload(fileName, photo, {
+              cacheControl: '3600',
+              upsert: false
+            });
 
-          if (uploadError) throw uploadError;
+          if (uploadError) {
+            console.error("Upload error details:", uploadError);
+            throw new Error(`Image upload failed: ${uploadError.message}`);
+          }
+          
+          console.log("Image uploaded successfully:", uploadData);
 
           // Get the public URL
-          photoUrl = supabase.storage.from('food-images').getPublicUrl(fileName).data.publicUrl;
+          const { data: urlData } = supabase.storage
+            .from('food-images')
+            .getPublicUrl(fileName);
+            
+          photoUrl = urlData.publicUrl;
+          console.log("Public image URL:", photoUrl);
         } catch (uploadErr: any) {
           console.error("Image upload error:", uploadErr);
+          toast.error(`Image upload failed: ${uploadErr.message}`);
           // Continue without image if upload fails
-          toast.error("Image upload failed, continuing without image");
         }
       }
 
-      // First try to get user info to verify the user exists in the database
-      const { data: userData, error: userError } = await supabase
+      // Make sure user profile exists first
+      console.log("Checking/creating user profile...");
+      const { error: profileError } = await supabase
         .from('profiles')
-        .select('id')
-        .eq('id', user.id)
-        .single();
-
-      // If user doesn't exist in profiles table, try to create one
-      if (userError) {
-        console.log("User profile may not exist, attempting to ensure user exists");
-        try {
-          const { error: createProfileError } = await supabase
-            .from('profiles')
-            .upsert({
-              id: user.id,
-              email: user.email,
-              created_at: new Date().toISOString()
-            });
-
-          if (createProfileError) {
-            console.error("Error creating user profile:", createProfileError);
-            // Continue anyway, as the food_listings table might not have a foreign key constraint
-          }
-        } catch (profileErr) {
-          console.error("Failed to create profile:", profileErr);
-        }
+        .upsert({
+          id: user.id,
+          email: user.email,
+          created_at: new Date().toISOString()
+        });
+        
+      if (profileError) {
+        console.error("Error creating/updating profile:", profileError);
       }
 
       // Save food listing with detailed debug information
-      console.log("Attempting to insert food listing with data:", {
+      const foodListing = {
         user_id: user.id,
         title: formData.title,
         description: formData.description,
@@ -125,36 +170,34 @@ const AddFood = () => {
         location: formData.location,
         image_url: photoUrl || null,
         status: 'available'
-      });
-
-      const { error } = await supabase
+      };
+      
+      console.log("Attempting to insert food listing:", foodListing);
+      
+      const { data: insertData, error: insertError } = await supabase
         .from('food_listings')
-        .insert({
-          user_id: user.id,
-          title: formData.title,
-          description: formData.description,
-          category: formData.category,
-          location: formData.location,
-          image_url: photoUrl || null,
-          status: 'available'
-        });
+        .insert(foodListing)
+        .select();
 
-      if (error) {
-        console.error("Supabase insert error details:", error);
-
+      if (insertError) {
+        console.error("Supabase insert error details:", insertError);
+        
         // Try to provide more specific error messages based on the error code
-        if (error.code === '42P01') {
-          toast.error("The food listings table doesn't exist in the database. Please set up your database first.");
-        } else if (error.code === '23505') {
+        if (insertError.code === '42P01') {
+          toast.error("Database table doesn't exist. Please contact support.");
+        } else if (insertError.code === '23505') {
           toast.error("A similar food listing already exists.");
-        } else if (error.code === '23503') {
-          toast.error("Your user account is not properly set up. Please try logging out and in again.");
+        } else if (insertError.code === '23503') {
+          toast.error("User account reference error. Please try logging out and in again.");
+        } else if (insertError.code === '42501') {
+          toast.error("Permission denied. You may not have access to create listings.");
         } else {
-          toast.error(`Database error: ${error.message || "Failed to create food listing"}`);
+          toast.error(`Database error: ${insertError.message}`);
         }
-        throw error;
+        throw insertError;
       }
 
+      console.log("Food listing created successfully:", insertData);
       toast.success("Food listing created successfully!");
       navigate("/");
 
