@@ -49,7 +49,10 @@ const Auth = () => {
           },
         });
         if (error) throw error;
-        toast.success("Verification email sent! Please check your inbox.");
+        //toast.success("Verification email sent! Please check your inbox.");
+        if (user) {
+          toast.success("Account created successfully! Verification bypassed for development.");
+        }
       }
     } catch (error: any) {
       toast.error(error.message);
