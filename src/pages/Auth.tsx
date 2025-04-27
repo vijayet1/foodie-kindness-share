@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail } from "lucide-react";
@@ -6,6 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import UserTypeSelection from "@/components/UserTypeSelection";
+
+type UserType = 'home_cook' | 'student' | 'organization';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -13,6 +15,7 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [userType, setUserType] = useState<UserType>('home_cook');
   const [loading, setLoading] = useState(false);
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -40,6 +43,7 @@ const Auth = () => {
           options: {
             data: {
               name,
+              user_type: userType,
             },
           },
         });
@@ -84,15 +88,24 @@ const Auth = () => {
       <div className="max-w-sm mx-auto">
         <form onSubmit={handleAuth} className="space-y-4">
           {!isLogin && !isForgotPassword && (
-            <div>
-              <Input
-                type="text"
-                placeholder="Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
+            <>
+              <div>
+                <Input
+                  type="text"
+                  placeholder="Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Select User Type</label>
+                <UserTypeSelection
+                  selectedType={userType}
+                  onTypeSelect={setUserType}
+                />
+              </div>
+            </>
           )}
           <div className="relative">
             <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
@@ -132,6 +145,7 @@ const Auth = () => {
           </Button>
         </form>
 
+        {/* Auth toggle and forgot password links */}
         <div className="mt-4 text-center space-y-2">
           {isLogin && !isForgotPassword && (
             <button
