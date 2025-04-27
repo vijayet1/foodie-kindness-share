@@ -1,3 +1,4 @@
+// @deprecated - This component is no longer used. Use the Sonner toaster from @/components/ui/sonner instead.
 import { useToast } from "@/hooks/use-toast"
 import {
   Toast,
