@@ -1,21 +1,39 @@
-
 import { Settings, Gift, Award } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { toast } from "@/components/ui/sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import UserAvatar from "@/components/UserAvatar";
 
 const ProfileStats = () => {
+  const [stats, setStats] = useState({
+    shared: 0,
+    received: 0,
+    rating: 0
+  });
+
+  useEffect(() => {
+    setStats({
+      shared: 0,
+      received: 0,
+      rating: 0
+    });
+  }, []);
+
   return (
     <div className="flex justify-around py-4 bg-white rounded-xl food-card-shadow">
       <div className="text-center">
-        <p className="text-lg font-bold text-foodie-green">12</p>
+        <p className="text-lg font-bold text-foodie-green">{stats.shared}</p>
         <p className="text-xs text-gray-500">Shared</p>
       </div>
       <div className="text-center border-x border-gray-100 px-8">
-        <p className="text-lg font-bold text-foodie-orange">8</p>
+        <p className="text-lg font-bold text-foodie-orange">{stats.received}</p>
         <p className="text-xs text-gray-500">Received</p>
       </div>
       <div className="text-center">
-        <p className="text-lg font-bold text-foodie-green">4.9</p>
+        <p className="text-lg font-bold text-foodie-green">{stats.rating || "-"}</p>
         <p className="text-xs text-gray-500">Rating</p>
       </div>
     </div>
@@ -41,6 +59,41 @@ const AchievementItem = ({ icon, title, description }: {
 };
 
 const Profile = () => {
+  const { user, isLoading } = useAuth();
+  const navigate = useNavigate();
+  
+  const formatMemberSince = () => {
+    if (!user?.created_at) return "New member";
+    
+    const date = new Date(user.created_at);
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long' };
+    return `Member since ${date.toLocaleDateString('en-US', options)}`;
+  };
+  
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success("Signed out successfully");
+      navigate("/auth");
+    } catch (error) {
+      toast.error("Error signing out");
+      console.error("Sign out error:", error);
+    }
+  };
+  
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-foodie-green"></div>
+      </div>
+    );
+  }
+  
+  if (!user) {
+    navigate("/auth");
+    return null;
+  }
+
   return (
     <div className="pb-20 max-w-md mx-auto">
       {/* Header */}
@@ -53,9 +106,11 @@ const Profile = () => {
       <div className="px-4">
         {/* User Info */}
         <div className="flex flex-col items-center mb-6">
-          <UserAvatar size="lg" />
-          <h2 className="font-bold text-lg mt-2">Sarah Johnson</h2>
-          <p className="text-gray-500 text-sm">Member since April 2024</p>
+          <UserAvatar size="lg" useAuthUser={true} />
+          <h2 className="font-bold text-lg mt-2">
+            {user.user_metadata?.name || user.email?.split('@')[0] || "User"}
+          </h2>
+          <p className="text-gray-500 text-sm">{formatMemberSince()}</p>
         </div>
         
         {/* Stats */}
@@ -67,13 +122,8 @@ const Profile = () => {
           <div className="space-y-3">
             <AchievementItem 
               icon={<Gift className="text-foodie-orange" size={20} />}
-              title="Generous Giver"
-              description="Shared more than 10 food items"
-            />
-            <AchievementItem 
-              icon={<Award className="text-foodie-green" size={20} />}
-              title="Top Rated"
-              description="Maintained a 4.5+ rating for 3 months"
+              title="New Member"
+              description="Welcome to Foodie Kindness Share!"
             />
           </div>
         </div>
@@ -96,7 +146,10 @@ const Profile = () => {
           </div>
         </div>
         
-        <button className="w-full border border-gray-300 text-gray-600 py-3 rounded-lg font-medium mt-8 mb-4">
+        <button 
+          onClick={handleSignOut}
+          className="w-full border border-gray-300 text-gray-600 py-3 rounded-lg font-medium mt-8 mb-4 hover:bg-gray-50 transition-colors"
+        >
           Sign Out
         </button>
       </div>

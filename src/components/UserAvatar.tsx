@@ -1,18 +1,27 @@
-
 import { User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface UserAvatarProps {
   imageUrl?: string;
   className?: string;
   size?: "sm" | "md" | "lg";
+  useAuthUser?: boolean;
 }
 
 const UserAvatar = ({ 
   imageUrl, 
   className, 
-  size = "md" 
+  size = "md",
+  useAuthUser = false
 }: UserAvatarProps) => {
+  const { user } = useAuth();
+  
+  // Get avatar URL from auth user if specified
+  const avatarUrl = useAuthUser 
+    ? user?.user_metadata?.avatar_url || imageUrl
+    : imageUrl;
+  
   const sizeClassMap = {
     sm: "w-8 h-8",
     md: "w-10 h-10",
@@ -27,9 +36,9 @@ const UserAvatar = ({
       sizeClass,
       className
     )}>
-      {imageUrl ? (
+      {avatarUrl ? (
         <img 
-          src={imageUrl} 
+          src={avatarUrl} 
           alt="User avatar" 
           className="w-full h-full object-cover"
         />
