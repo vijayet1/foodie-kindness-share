@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import UserTypeSelection from "@/components/UserTypeSelection";
 
-type UserType = 'home_cook' | 'student' | 'organization';
+// Updated UserType to match UserTypeSelection
+type UserType = 'individual' | 'orgs' | 'charity_orgs';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,7 +16,7 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [userType, setUserType] = useState<UserType>('home_cook');
+  const [userType, setUserType] = useState<UserType>('individual'); // Updated initial userType to 'individual'
   const [loading, setLoading] = useState(false);
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -43,7 +44,7 @@ const Auth = () => {
           options: {
             data: {
               name,
-              user_type: userType,
+              user_type: userType, // Ensure userType is part of the signup data
             },
           },
         });
@@ -101,8 +102,8 @@ const Auth = () => {
               <div className="space-y-2">
                 <label className="text-sm font-medium">Select User Type</label>
                 <UserTypeSelection
-                  selectedType={userType}
-                  onTypeSelect={setUserType}
+                  selectedType={userType} // Prop matches UserTypeSelection
+                  onTypeSelect={setUserType} // Handles userType selection
                 />
               </div>
             </>
