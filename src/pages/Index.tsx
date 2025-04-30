@@ -2,18 +2,22 @@
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/contexts/AuthContext";
+import FoodListingsGrid from "@/components/FoodListingsGrid";
+import AddFoodButton from "@/components/AddFoodButton";
 
 const Index = () => {
   const { session, userType, isLoading } = useAuth();
 
+  // Show loading state while authentication is being checked
   if (isLoading) {
     return (
       <div className="min-h-screen bg-sage-50 flex items-center justify-center">
-        <p>Loading...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-foodie-green"></div>
       </div>
     );
   }
 
+  // If no session, show the landing page for non-authenticated users
   if (!session) {
     return (
       <div className="min-h-screen bg-sage-50 px-4 py-8">
@@ -55,6 +59,7 @@ const Index = () => {
     );
   }
 
+  // Render appropriate view based on user type
   return (
     <div className="min-h-screen bg-sage-50 px-4 py-8 pb-24">
       <div className="mb-6">
@@ -70,10 +75,10 @@ const Index = () => {
         </p>
       </div>
       
-      {/* Add your food listing components here */}
-      <div className="text-center text-gray-500 mt-8">
-        No items available yet
-      </div>
+      <FoodListingsGrid />
+      
+      {/* Show Add Food button for individuals and organizations */}
+      {(userType === 'individual' || userType === 'orgs') && <AddFoodButton />}
 
       <Navbar />
     </div>

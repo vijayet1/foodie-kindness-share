@@ -1,7 +1,7 @@
+
 import { Settings } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import UserAvatar from "@/components/UserAvatar";
 import Navbar from "@/components/Navbar";
@@ -33,7 +33,7 @@ const ProfileStats = () => {
 };
 
 const Profile = () => {
-  const { user, userType, isLoading } = useAuth();
+  const { user, userType, isLoading, signOut } = useAuth();
   const navigate = useNavigate();
   
   const formatMemberSince = () => {
@@ -46,9 +46,9 @@ const Profile = () => {
   
   const handleSignOut = async () => {
     try {
-      await supabase.auth.signOut();
+      await signOut();
       toast.success("Signed out successfully");
-      navigate("/auth");
+      navigate("/");
     } catch (error) {
       toast.error("Error signing out");
       console.error("Sign out error:", error);
@@ -94,6 +94,26 @@ const Profile = () => {
         
         {/* Stats */}
         <ProfileStats />
+        
+        {/* Waste Tracking */}
+        <div className="mt-6">
+          <Link to="/waste-tracking">
+            <div className="bg-white rounded-lg p-4 shadow-sm flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="bg-eco-light-green/20 rounded-full p-3 mr-3">
+                  <span role="img" aria-label="recycle" className="text-xl">♻️</span>
+                </div>
+                <div>
+                  <p className="font-medium">Waste Tracking</p>
+                  <p className="text-sm text-gray-500">Track food consumption and waste</p>
+                </div>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
+                <path d="m9 18 6-6-6-6"></path>
+              </svg>
+            </div>
+          </Link>
+        </div>
         
         {/* Achievements */}
         <div className="mt-6">

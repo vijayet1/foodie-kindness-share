@@ -1,16 +1,17 @@
 
-import { Clock, MapPin } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import RequestButton from "@/components/RequestButton";
 
 interface FoodItemProps {
   id: string;
   title: string;
   description: string;
   location: string;
-  distance: string;
+  distance?: string;
   timePosted: string;
   imageUrl: string;
-  className?: string;
+  category: string;
+  listingId: string;
 }
 
 const FoodItem = ({
@@ -21,38 +22,43 @@ const FoodItem = ({
   distance,
   timePosted,
   imageUrl,
-  className
+  category,
+  listingId
 }: FoodItemProps) => {
-  return (
-    <div className={cn(
-      "bg-white rounded-xl overflow-hidden mb-4 food-card-shadow animate-fade-in",
-      className
-    )}>
-      <div className="h-48 overflow-hidden">
-        <img
-          src={imageUrl}
-          alt={title}
-          className="w-full h-full object-cover"
-        />
-      </div>
+  const getCategoryColor = (cat: string) => {
+    const categories: Record<string, string> = {
+      fruits: "bg-green-100 text-green-800",
+      vegetables: "bg-emerald-100 text-emerald-800",
+      prepared: "bg-blue-100 text-blue-800",
+      baked: "bg-yellow-100 text-yellow-800", 
+      pantry: "bg-orange-100 text-orange-800",
+      other: "bg-gray-100 text-gray-800",
+    };
+    return categories[cat] || categories.other;
+  };
 
+  return (
+    <div>
+      <div className="relative">
+        <img 
+          src={imageUrl} 
+          alt={title} 
+          className="w-full h-48 object-cover"
+        />
+        <Badge 
+          className={`absolute top-3 right-3 ${getCategoryColor(category)}`}
+        >
+          {category.charAt(0).toUpperCase() + category.slice(1)}
+        </Badge>
+      </div>
       <div className="p-4">
         <h3 className="font-bold text-lg">{title}</h3>
-        <p className="text-gray-600 text-sm mt-1 line-clamp-2">{description}</p>
-
-        <div className="flex items-center mt-3 text-gray-500">
-          <MapPin size={16} />
-          <span className="text-xs ml-1">{location} · {distance}</span>
+        <p className="text-gray-600 text-sm line-clamp-2 mb-2">{description}</p>
+        <div className="flex justify-between text-xs text-gray-500 mb-3">
+          <span>📍 {location} {distance && `· ${distance}`}</span>
+          <span>{timePosted}</span>
         </div>
-
-        <div className="flex items-center mt-2 text-gray-500">
-          <Clock size={16} />
-          <span className="text-xs ml-1">{timePosted}</span>
-        </div>
-
-        <button className="w-full mt-3 bg-foodie-green text-white py-2 rounded-lg font-medium">
-          Request
-        </button>
+        <RequestButton listingId={listingId} />
       </div>
     </div>
   );

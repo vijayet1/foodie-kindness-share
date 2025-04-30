@@ -9,40 +9,127 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      food_listings: {
+      food_claims: {
         Row: {
+          claimer_id: string
+          created_at: string | null
           id: string
-          user_id: string
-          title: string
-          description: string
-          category: string
-          location: string
-          image_url: string | null
+          listing_id: string
+          quantity_claimed: number
+          quantity_consumed: number | null
+          quantity_wasted: number | null
           status: string
-          created_at?: string
+          updated_at: string | null
         }
         Insert: {
+          claimer_id: string
+          created_at?: string | null
           id?: string
-          user_id: string
-          title: string
-          description: string
-          category: string
-          location: string
-          image_url?: string | null
-          status: string
-          created_at?: string
+          listing_id: string
+          quantity_claimed?: number
+          quantity_consumed?: number | null
+          quantity_wasted?: number | null
+          status?: string
+          updated_at?: string | null
         }
         Update: {
+          claimer_id?: string
+          created_at?: string | null
           id?: string
-          user_id?: string
-          title?: string
-          description?: string
-          category?: string
-          location?: string
-          image_url?: string | null
+          listing_id?: string
+          quantity_claimed?: number
+          quantity_consumed?: number | null
+          quantity_wasted?: number | null
           status?: string
-          created_at?: string
+          updated_at?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "food_claims_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "food_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      food_listings: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string
+          expiry_date: string | null
+          id: string
+          image_url: string | null
+          location: string
+          pickup_window: string | null
+          quantity: number
+          status: string
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description: string
+          expiry_date?: string | null
+          id?: string
+          image_url?: string | null
+          location: string
+          pickup_window?: string | null
+          quantity?: number
+          status?: string
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string
+          expiry_date?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string
+          pickup_window?: string | null
+          quantity?: number
+          status?: string
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string | null
+          updated_at: string | null
+          user_type: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          id: string
+          name?: string | null
+          updated_at?: string | null
+          user_type?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string | null
+          updated_at?: string | null
+          user_type?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {

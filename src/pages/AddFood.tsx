@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Camera, MapPin, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,7 +17,9 @@ const AddFood = () => {
     title: "",
     description: "",
     category: "",
-    location: ""
+    location: "",
+    quantity: 1,
+    expiry_date: ""
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -51,80 +54,42 @@ const AddFood = () => {
     try {
       let photoUrl = "";
 
-      // Upload photo if available - with simplified error handling
+      // Upload photo if available
       if (photo) {
-        try {
-          const fileName = `${user.id}-${Date.now()}-${photo.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+        const fileName = `${user.id}-${Date.now()}-${photo.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('food-images')
+          .upload(fileName, photo, {
+            cacheControl: '3600',
+            upsert: false
+          });
 
-          console.log("Checking storage buckets...");
-          // First, check if the bucket exists
-          const { data: buckets, error: bucketListError } = await supabase.storage.listBuckets();
-
-          if (bucketListError) {
-            console.error("Error listing buckets:", bucketListError);
-            throw new Error(`Error listing buckets: ${bucketListError.message}`);
-          }
-
-          const bucketExists = buckets?.some(bucket => bucket.name === 'food-images');
-          console.log("Bucket exists:", bucketExists);
-
-          // If bucket doesn't exist, create it
-          if (!bucketExists) {
-            console.log("Creating bucket 'food-images'...");
-            const { data: newBucket, error: createBucketError } = await supabase.storage.createBucket('food-images', {
-              public: true // Make the bucket public so images can be accessed
-            });
-
-            if (createBucketError) {
-              console.error("Error creating bucket:", createBucketError);
-              throw new Error(`Couldn't create storage bucket: ${createBucketError.message}`);
-            }
-
-            console.log("Bucket created:", newBucket);
-          }
-
-          // Now upload the file
-          console.log("Uploading image...");
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('food-images')
-            .upload(fileName, photo, {
-              cacheControl: '3600',
-              upsert: false
-            });
-
-          if (uploadError) {
-            console.error("Upload error details:", uploadError);
-            throw new Error(`Image upload failed: ${uploadError.message}`);
-          }
-
-          console.log("Image uploaded successfully:", uploadData);
-
-          // Get the public URL
-          const { data: urlData } = supabase.storage
-            .from('food-images')
-            .getPublicUrl(fileName);
-
-          photoUrl = urlData.publicUrl;
-          console.log("Public image URL:", photoUrl);
-        } catch (uploadErr: any) {
-          console.error("Image upload error:", uploadErr);
-          toast.error(`Image upload failed: ${uploadErr.message}`);
-          // Continue without image if upload fails
+        if (uploadError) {
+          console.error("Upload error details:", uploadError);
+          throw new Error(`Image upload failed: ${uploadError.message}`);
         }
+
+        // Get the public URL
+        const { data: urlData } = supabase.storage
+          .from('food-images')
+          .getPublicUrl(fileName);
+
+        photoUrl = urlData.publicUrl;
       }
 
-      // Save food listing directly - don't try to create tables automatically
+      // Save food listing
       const foodListing = {
         user_id: user.id,
         title: formData.title,
         description: formData.description,
         category: formData.category,
         location: formData.location,
+        quantity: formData.quantity,
+        expiry_date: formData.expiry_date || null,
         image_url: photoUrl || null,
         status: 'available'
       };
-
-      console.log("Attempting to insert food listing:", foodListing);
 
       const { data: insertData, error: insertError } = await supabase
         .from('food_listings')
@@ -133,16 +98,9 @@ const AddFood = () => {
 
       if (insertError) {
         console.error("Supabase insert error details:", insertError);
-
-        if (insertError.code === '42P01') {
-          toast.error("The food_listings table doesn't exist in your database. Please check Supabase setup.");
-        } else {
-          toast.error(`Database error: ${insertError.message}`);
-        }
         throw insertError;
       }
 
-      console.log("Food listing created successfully:", insertData);
       toast.success("Food listing created successfully!");
       navigate("/");
 
@@ -219,6 +177,35 @@ const AddFood = () => {
               className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-foodie-green focus:border-transparent resize-none"
               required
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="quantity" className="text-sm font-medium text-gray-700 block mb-1">
+                Quantity
+              </label>
+              <input
+                type="number"
+                id="quantity"
+                value={formData.quantity}
+                onChange={handleInputChange}
+                min="1"
+                className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-foodie-green focus:border-transparent"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="expiry_date" className="text-sm font-medium text-gray-700 block mb-1">
+                Expiry Date
+              </label>
+              <input
+                type="date"
+                id="expiry_date"
+                value={formData.expiry_date}
+                onChange={handleInputChange}
+                className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-foodie-green focus:border-transparent"
+              />
+            </div>
           </div>
 
           <div>

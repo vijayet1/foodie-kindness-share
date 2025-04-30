@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -9,6 +10,7 @@ import AddFood from "./pages/AddFood";
 import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
 import Map from "./pages/Map";
+import WasteTracking from "./pages/WasteTracking";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +26,7 @@ const App = () => (
             <Route path="/add-food" element={<AddFood />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/map" element={<Map />} />
+            <Route path="/waste-tracking" element={<WasteTracking />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
