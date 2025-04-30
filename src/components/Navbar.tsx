@@ -1,4 +1,5 @@
-import { Home, PlusSquare, User } from "lucide-react";
+
+import { Home, PlusSquare, User, Map as MapIcon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -28,6 +29,16 @@ const Navbar = () => {
           >
             <Home size={24} />
             <span className="text-xs mt-1">Find Food</span>
+          </Link>
+        )}
+
+        {canFind && (
+          <Link
+            to="/map"
+            className={`flex flex-col items-center ${getActiveClass('/map')}`}
+          >
+            <MapIcon size={24} />
+            <span className="text-xs mt-1">Map</span>
           </Link>
         )}
 

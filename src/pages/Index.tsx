@@ -50,6 +50,7 @@ const Index = () => {
           </Link>
           <Link 
             to="/auth" 
+            state={{ isSignUp: true }}
             className="block w-full bg-eco-green text-white text-center py-3 rounded-xl"
           >
             Sign Up
@@ -59,26 +60,37 @@ const Index = () => {
     );
   }
 
+  // Determine what content to show based on user type
+  let pageTitle, pageDescription, showAddButton = false, excludeOwnListings = true;
+  
+  if (userType === 'charity_orgs') {
+    pageTitle = 'Available Food';
+    pageDescription = 'Find and collect available food';
+    excludeOwnListings = true; // Show other users' food
+  } else if (userType === 'orgs') {
+    pageTitle = 'Your Shared Items';
+    pageDescription = 'Manage your food sharing';
+    excludeOwnListings = false; // Show their own food
+    showAddButton = true;
+  } else { // individual
+    pageTitle = 'Food Near You';
+    pageDescription = 'Discover and share food in your community';
+    excludeOwnListings = true; // Show other users' food
+    showAddButton = true;
+  }
+
   // Render appropriate view based on user type
   return (
     <div className="min-h-screen bg-sage-50 px-4 py-8 pb-24">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">
-          {userType === 'charity_orgs' ? 'Available Food' : 
-           userType === 'orgs' ? 'Your Shared Items' : 
-           'Food Near You'}
-        </h1>
-        <p className="text-gray-600">
-          {userType === 'charity_orgs' ? 'Find and collect available food' : 
-           userType === 'orgs' ? 'Manage your food sharing' : 
-           'Discover and share food in your community'}
-        </p>
+        <h1 className="text-2xl font-bold">{pageTitle}</h1>
+        <p className="text-gray-600">{pageDescription}</p>
       </div>
       
-      <FoodListingsGrid />
+      <FoodListingsGrid excludeOwnListings={excludeOwnListings} />
       
       {/* Show Add Food button for individuals and organizations */}
-      {(userType === 'individual' || userType === 'orgs') && <AddFoodButton />}
+      {showAddButton && <AddFoodButton />}
 
       <Navbar />
     </div>

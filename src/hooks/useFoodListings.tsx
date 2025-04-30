@@ -4,20 +4,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
-export function useFoodListings() {
+export function useFoodListings(excludeOwnListings = true) {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ["foodListings"],
+    queryKey: ["foodListings", excludeOwnListings, user?.id],
     queryFn: async () => {
       try {
         console.log("Fetching food listings");
-        // First fetch the food listings
-        const { data: listings, error: listingsError } = await supabase
+        // Start with the base query
+        let query = supabase
           .from("food_listings")
           .select("*")
           .eq("status", "available") // Only fetch available listings
           .order("created_at", { ascending: false });
+        
+        // If excludeOwnListings is true and user is logged in, exclude their listings
+        if (excludeOwnListings && user) {
+          query = query.neq("user_id", user.id);
+        }
+        
+        // Execute the query
+        const { data: listings, error: listingsError } = await query;
 
         if (listingsError) {
           console.error("Error fetching listings:", listingsError);

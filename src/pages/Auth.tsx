@@ -1,10 +1,11 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 import UserTypeSelection from "@/components/UserTypeSelection";
 
 // Updated UserType to match UserTypeSelection
@@ -16,7 +17,7 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [userType, setUserType] = useState<UserType>('individual'); // Updated initial userType to 'individual'
+  const [userType, setUserType] = useState<UserType>('individual');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -68,11 +69,15 @@ const Auth = () => {
           if (signInError) {
             console.error("Auto-login failed:", signInError);
             toast.error("Registration successful but auto-login failed. Please log in manually.");
+            // Reset to login page
+            setIsLogin(true);
           } else {
             navigate('/');
           }
         } else {
           toast.success("Verification email sent! Please check your inbox.");
+          // Reset to login page
+          setIsLogin(true);
         }
       }
     } catch (error: any) {
@@ -81,6 +86,15 @@ const Auth = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Function to handle switching between login and signup
+  const handleModeToggle = () => {
+    setEmail("");
+    setPassword("");
+    setName("");
+    setIsLogin(!isLogin);
+    setIsForgotPassword(false);
   };
 
   return (
@@ -127,8 +141,8 @@ const Auth = () => {
               <div className="space-y-2">
                 <label className="text-sm font-medium">Select User Type</label>
                 <UserTypeSelection
-                  selectedType={userType} // Prop matches UserTypeSelection
-                  onTypeSelect={setUserType} // Handles userType selection
+                  selectedType={userType}
+                  onTypeSelect={setUserType}
                 />
               </div>
             </>
@@ -195,7 +209,7 @@ const Auth = () => {
             <p className="text-gray-600">
               {isLogin ? "Don't have an account? " : "Already have an account? "}
               <button
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={handleModeToggle}
                 className="text-eco-green font-medium hover:underline"
               >
                 {isLogin ? "Sign up" : "Login"}

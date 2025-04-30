@@ -4,8 +4,12 @@ import { useFoodListings } from "@/hooks/useFoodListings";
 import FoodItem from "@/components/FoodItem";
 import { formatDistanceToNow } from "date-fns";
 
-const FoodListingsGrid = () => {
-  const { data: foodListings, isLoading, isError } = useFoodListings();
+interface FoodListingsGridProps {
+  excludeOwnListings?: boolean;
+}
+
+const FoodListingsGrid = ({ excludeOwnListings = true }: FoodListingsGridProps) => {
+  const { data: foodListings, isLoading, isError } = useFoodListings(excludeOwnListings);
   const [filter, setFilter] = useState<string>("all");
   
   if (isLoading) {

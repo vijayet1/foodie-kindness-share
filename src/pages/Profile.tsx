@@ -5,31 +5,13 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import UserAvatar from "@/components/UserAvatar";
 import Navbar from "@/components/Navbar";
+import ProfileStats from "@/components/ProfileStats";
 
 // User type labels for display
 const userTypeLabels = {
   individual: "Individual",
   orgs: "Organization",
   charity_orgs: "Charity Organization"
-};
-
-const ProfileStats = () => {
-  return (
-    <div className="grid grid-cols-3 gap-4 bg-white rounded-lg p-4 shadow-sm">
-      <div className="text-center">
-        <p className="text-2xl font-bold text-foodie-green">0</p>
-        <p className="text-xs text-gray-500">Shared</p>
-      </div>
-      <div className="text-center border-x border-gray-100">
-        <p className="text-2xl font-bold text-foodie-orange">0</p>
-        <p className="text-xs text-gray-500">Received</p>
-      </div>
-      <div className="text-center">
-        <p className="text-2xl font-bold text-foodie-brown">0</p>
-        <p className="text-xs text-gray-500">Points</p>
-      </div>
-    </div>
-  );
 };
 
 const Profile = () => {
@@ -115,6 +97,26 @@ const Profile = () => {
           </Link>
         </div>
         
+        {/* Map View */}
+        <div className="mt-6">
+          <Link to="/map">
+            <div className="bg-white rounded-lg p-4 shadow-sm flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="bg-blue-100 rounded-full p-3 mr-3">
+                  <span role="img" aria-label="map" className="text-xl">🗺️</span>
+                </div>
+                <div>
+                  <p className="font-medium">Map View</p>
+                  <p className="text-sm text-gray-500">Find food near you</p>
+                </div>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
+                <path d="m9 18 6-6-6-6"></path>
+              </svg>
+            </div>
+          </Link>
+        </div>
+        
         {/* Achievements */}
         <div className="mt-6">
           <h3 className="font-semibold mb-2">My Achievements</h3>
@@ -135,14 +137,6 @@ const Profile = () => {
           <div className="bg-white rounded-lg p-4 shadow-sm text-center py-6">
             <p className="text-gray-500">No recent activity</p>
             <p className="text-sm text-gray-400 mt-1">Start sharing or claiming food</p>
-          </div>
-        </div>
-        
-        {/* Feedback & Reviews */}
-        <div className="mt-6">
-          <div className="bg-white rounded-lg p-4 shadow-sm">
-            <h3 className="font-semibold mb-2">Feedback & Reviews</h3>
-            <p className="text-sm text-gray-500">Your community reputation</p>
           </div>
         </div>
         
