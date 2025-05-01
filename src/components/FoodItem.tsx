@@ -1,6 +1,8 @@
 
 import { Badge } from "@/components/ui/badge";
 import RequestButton from "@/components/RequestButton";
+import { useAuth } from "@/contexts/AuthContext";
+import { format, isPast } from "date-fns";
 
 interface FoodItemProps {
   id: string;
@@ -12,6 +14,9 @@ interface FoodItemProps {
   imageUrl: string;
   category: string;
   listingId: string;
+  userId: string;
+  expiryDate?: string | null;
+  status?: string;
 }
 
 const FoodItem = ({
@@ -23,8 +28,20 @@ const FoodItem = ({
   timePosted,
   imageUrl,
   category,
-  listingId
+  listingId,
+  userId,
+  expiryDate,
+  status
 }: FoodItemProps) => {
+  const { user } = useAuth();
+  const isOwnListing = userId === user?.id;
+  
+  // Check if the food is expired
+  const isExpired = expiryDate && isPast(new Date(expiryDate));
+  
+  // Check if the food has been claimed
+  const isClaimed = status === 'claimed';
+  
   const getCategoryColor = (cat: string) => {
     const categories: Record<string, string> = {
       fruits: "bg-green-100 text-green-800",
@@ -38,18 +55,35 @@ const FoodItem = ({
   };
 
   return (
-    <div>
+    <div className={`relative ${isExpired ? 'opacity-70' : ''}`}>
       <div className="relative">
         <img 
           src={imageUrl} 
           alt={title} 
-          className="w-full h-48 object-cover"
+          className={`w-full h-48 object-cover ${isExpired ? 'grayscale' : ''}`}
         />
         <Badge 
           className={`absolute top-3 right-3 ${getCategoryColor(category)}`}
         >
           {category.charAt(0).toUpperCase() + category.slice(1)}
         </Badge>
+        
+        {/* Status Watermarks */}
+        {isExpired && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="bg-red-500 bg-opacity-70 text-white font-bold py-2 px-4 rotate-[-30deg] transform text-xl">
+              EXPIRED
+            </div>
+          </div>
+        )}
+        
+        {!isExpired && isClaimed && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="bg-green-500 bg-opacity-70 text-white font-bold py-2 px-4 rotate-[-30deg] transform text-xl">
+              CLAIMED
+            </div>
+          </div>
+        )}
       </div>
       <div className="p-4">
         <h3 className="font-bold text-lg">{title}</h3>
@@ -58,7 +92,19 @@ const FoodItem = ({
           <span>📍 {location} {distance && `· ${distance}`}</span>
           <span>{timePosted}</span>
         </div>
-        <RequestButton listingId={listingId} />
+        {expiryDate && (
+          <div className="text-xs text-gray-500 mb-3">
+            Expires: {format(new Date(expiryDate), 'MMM d, yyyy')}
+          </div>
+        )}
+        {!isOwnListing && !isExpired && (
+          <RequestButton listingId={listingId} />
+        )}
+        {isOwnListing && (
+          <div className="text-sm text-foodie-green font-medium py-2 px-4 border border-foodie-green rounded-md text-center">
+            Your Listing
+          </div>
+        )}
       </div>
     </div>
   );

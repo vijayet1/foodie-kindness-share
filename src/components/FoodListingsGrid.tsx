@@ -3,14 +3,20 @@ import { useState } from "react";
 import { useFoodListings } from "@/hooks/useFoodListings";
 import FoodItem from "@/components/FoodItem";
 import { formatDistanceToNow } from "date-fns";
+import { useAuth } from "@/contexts/AuthContext";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface FoodListingsGridProps {
   excludeOwnListings?: boolean;
 }
 
 const FoodListingsGrid = ({ excludeOwnListings = true }: FoodListingsGridProps) => {
-  const { data: foodListings, isLoading, isError } = useFoodListings(excludeOwnListings);
+  const { user } = useAuth();
+  const [viewMode, setViewMode] = useState<"others" | "mine">("others");
   const [filter, setFilter] = useState<string>("all");
+  
+  // Always fetch all listings and filter them on the client side
+  const { data: allFoodListings, isLoading, isError } = useFoodListings(false);
   
   if (isLoading) {
     return (
@@ -28,7 +34,7 @@ const FoodListingsGrid = ({ excludeOwnListings = true }: FoodListingsGridProps) 
     );
   }
   
-  if (!foodListings || foodListings.length === 0) {
+  if (!allFoodListings || allFoodListings.length === 0) {
     return (
       <div className="text-center py-8">
         <p className="text-gray-500">No food listings available</p>
@@ -36,13 +42,30 @@ const FoodListingsGrid = ({ excludeOwnListings = true }: FoodListingsGridProps) 
     );
   }
   
-  // Filter listings based on selected category
+  // Filter listings based on viewMode (mine vs others)
+  const modeFilteredListings = viewMode === "mine" 
+    ? allFoodListings.filter(item => item.user_id === user?.id)
+    : allFoodListings.filter(item => item.user_id !== user?.id);
+  
+  // Then filter by selected category
   const filteredListings = filter === "all" 
-    ? foodListings 
-    : foodListings.filter(item => item.category === filter);
+    ? modeFilteredListings 
+    : modeFilteredListings.filter(item => item.category === filter);
   
   return (
     <div>
+      {/* View mode tabs (Mine vs Others) */}
+      <Tabs 
+        defaultValue="others" 
+        className="mb-4"
+        onValueChange={(value) => setViewMode(value as "others" | "mine")}
+      >
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="others">Others Food</TabsTrigger>
+          <TabsTrigger value="mine">My Food</TabsTrigger>
+        </TabsList>
+      </Tabs>
+      
       {/* Category filters */}
       <div className="flex overflow-x-auto gap-2 mb-4 pb-2 px-4 -mx-4">
         <button 
@@ -79,7 +102,10 @@ const FoodListingsGrid = ({ excludeOwnListings = true }: FoodListingsGridProps) 
               timePosted={formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
               imageUrl={item.image_url || "/placeholder.svg"}
               category={item.category}
-              listingId={item.id} // Pass the listingId to FoodItem for the RequestButton
+              listingId={item.id} 
+              userId={item.user_id}
+              expiryDate={item.expiry_date}
+              status={item.status}
             />
           </div>
         ))}

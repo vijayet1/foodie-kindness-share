@@ -8,7 +8,7 @@ export function useFoodListings(excludeOwnListings = true) {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ["foodListings", excludeOwnListings, user?.id],
+    queryKey: ["foodListings", user?.id],
     queryFn: async () => {
       try {
         console.log("Fetching food listings");
@@ -16,13 +16,7 @@ export function useFoodListings(excludeOwnListings = true) {
         let query = supabase
           .from("food_listings")
           .select("*")
-          .eq("status", "available") // Only fetch available listings
           .order("created_at", { ascending: false });
-        
-        // If excludeOwnListings is true and user is logged in, exclude their listings
-        if (excludeOwnListings && user) {
-          query = query.neq("user_id", user.id);
-        }
         
         // Execute the query
         const { data: listings, error: listingsError } = await query;

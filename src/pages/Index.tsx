@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import FoodListingsGrid from "@/components/FoodListingsGrid";
 
 const Index = () => {
-  const { session, userType, isLoading } = useAuth();
+  const { session, isLoading } = useAuth();
 
   // Show loading state while authentication is being checked
   if (isLoading) {
@@ -59,32 +59,15 @@ const Index = () => {
     );
   }
 
-  // Determine what content to show based on user type
-  let pageTitle, pageDescription, excludeOwnListings = true;
-  
-  if (userType === 'charity_orgs') {
-    pageTitle = 'Available Food';
-    pageDescription = 'Find and collect available food';
-    excludeOwnListings = true; // Show other users' food
-  } else if (userType === 'orgs') {
-    pageTitle = 'Your Shared Items';
-    pageDescription = 'Manage your food sharing';
-    excludeOwnListings = false; // Show their own food
-  } else { // individual
-    pageTitle = 'Food Near You';
-    pageDescription = 'Discover and share food in your community';
-    excludeOwnListings = true; // Show other users' food
-  }
-
-  // Render appropriate view based on user type
+  // Render the main content for authenticated users
   return (
     <div className="min-h-screen bg-sage-50 px-4 py-8 pb-24">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">{pageTitle}</h1>
-        <p className="text-gray-600">{pageDescription}</p>
+        <h1 className="text-2xl font-bold">Food Listings</h1>
+        <p className="text-gray-600">Discover and share food in your community</p>
       </div>
       
-      <FoodListingsGrid excludeOwnListings={excludeOwnListings} />
+      <FoodListingsGrid />
       
       <Navbar />
     </div>
