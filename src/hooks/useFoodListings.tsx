@@ -60,10 +60,14 @@ export function useFoodListings(excludeOwnListings = true) {
         return listings || [];
       } catch (error: any) {
         console.error("Error in useFoodListings:", error);
-        toast.error("Failed to load food listings");
+        toast.error("Failed to load food listings", {
+          duration: 3000,
+          position: "bottom-center", // Mobile-friendly position
+        });
         return [];
       }
     },
     enabled: true, // Always fetch listings regardless of auth status
+    staleTime: 60000, // Cache data for 1 minute for better mobile performance
   });
 }

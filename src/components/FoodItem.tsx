@@ -60,10 +60,10 @@ const FoodItem = ({
         <img 
           src={imageUrl} 
           alt={title} 
-          className={`w-full h-48 object-cover ${isExpired ? 'grayscale' : ''}`}
+          className={`w-full h-36 sm:h-48 object-cover ${isExpired ? 'grayscale' : ''}`}
         />
         <Badge 
-          className={`absolute top-3 right-3 ${getCategoryColor(category)}`}
+          className={`absolute top-2 right-2 text-xs ${getCategoryColor(category)}`}
         >
           {category.charAt(0).toUpperCase() + category.slice(1)}
         </Badge>
@@ -71,7 +71,7 @@ const FoodItem = ({
         {/* Status Watermarks */}
         {isExpired && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="bg-red-500 bg-opacity-70 text-white font-bold py-2 px-4 rotate-[-30deg] transform text-xl">
+            <div className="bg-red-500 bg-opacity-70 text-white font-bold py-1 sm:py-2 px-3 sm:px-4 rotate-[-30deg] transform text-base sm:text-xl">
               EXPIRED
             </div>
           </div>
@@ -79,21 +79,21 @@ const FoodItem = ({
         
         {!isExpired && isClaimed && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="bg-green-500 bg-opacity-70 text-white font-bold py-2 px-4 rotate-[-30deg] transform text-xl">
+            <div className="bg-green-500 bg-opacity-70 text-white font-bold py-1 sm:py-2 px-3 sm:px-4 rotate-[-30deg] transform text-base sm:text-xl">
               CLAIMED
             </div>
           </div>
         )}
       </div>
-      <div className="p-4">
-        <h3 className="font-bold text-lg">{title}</h3>
-        <p className="text-gray-600 text-sm line-clamp-2 mb-2">{description}</p>
-        <div className="flex justify-between text-xs text-gray-500 mb-3">
-          <span>📍 {location} {distance && `· ${distance}`}</span>
-          <span>{timePosted}</span>
+      <div className="p-3 sm:p-4">
+        <h3 className="font-bold text-base sm:text-lg">{title}</h3>
+        <p className="text-gray-600 text-xs sm:text-sm line-clamp-2 mb-2">{description}</p>
+        <div className="flex justify-between text-xs text-gray-500 mb-2 sm:mb-3">
+          <span className="truncate pr-1">📍 {location} {distance && `· ${distance}`}</span>
+          <span className="text-right">{timePosted}</span>
         </div>
         {expiryDate && (
-          <div className="text-xs text-gray-500 mb-3">
+          <div className="text-xs text-gray-500 mb-2 sm:mb-3">
             Expires: {format(new Date(expiryDate), 'MMM d, yyyy')}
           </div>
         )}
@@ -101,7 +101,7 @@ const FoodItem = ({
           <RequestButton listingId={listingId} />
         )}
         {isOwnListing && (
-          <div className="text-sm text-foodie-green font-medium py-2 px-4 border border-foodie-green rounded-md text-center">
+          <div className="text-xs sm:text-sm text-foodie-green font-medium py-1 sm:py-2 px-3 sm:px-4 border border-foodie-green rounded-md text-center">
             Your Listing
           </div>
         )}
