@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,8 @@ import UserTypeSelection from "@/components/UserTypeSelection";
 type UserType = 'individual' | 'orgs' | 'charity_orgs';
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const location = useLocation();
+  const [isLogin, setIsLogin] = useState(!location.state?.isSignUp);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,13 +35,17 @@ const Auth = () => {
         toast.success("Password reset email sent! Check your inbox.");
         setIsForgotPassword(false);
       } else if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
+        
         if (error) throw error;
-        toast.success("Logged in successfully!");
-        navigate('/');
+        
+        if (data && data.user) {
+          toast.success("Logged in successfully!");
+          navigate('/');
+        }
       } else {
         // Sign up flow
         const { data, error } = await supabase.auth.signUp({
@@ -56,27 +61,22 @@ const Auth = () => {
         
         if (error) throw error;
         
-        // Check if data exists and has user property
         if (data && data.user) {
-          toast.success("Account created successfully!");
-          
-          // Automatically sign in the user after successful registration
-          const { error: signInError } = await supabase.auth.signInWithPassword({
+          // After successful signup, automatically sign in
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
             email,
             password,
           });
           
           if (signInError) {
-            console.error("Auto-login failed:", signInError);
             toast.error("Registration successful but auto-login failed. Please log in manually.");
-            // Reset to login page
             setIsLogin(true);
-          } else {
+          } else if (signInData && signInData.user) {
+            toast.success("Account created and logged in successfully!");
             navigate('/');
           }
         } else {
           toast.success("Verification email sent! Please check your inbox.");
-          // Reset to login page
           setIsLogin(true);
         }
       }

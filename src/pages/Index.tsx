@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/contexts/AuthContext";
 import FoodListingsGrid from "@/components/FoodListingsGrid";
-import AddFoodButton from "@/components/AddFoodButton";
 
 const Index = () => {
   const { session, userType, isLoading } = useAuth();
@@ -61,7 +60,7 @@ const Index = () => {
   }
 
   // Determine what content to show based on user type
-  let pageTitle, pageDescription, showAddButton = false, excludeOwnListings = true;
+  let pageTitle, pageDescription, excludeOwnListings = true;
   
   if (userType === 'charity_orgs') {
     pageTitle = 'Available Food';
@@ -71,12 +70,10 @@ const Index = () => {
     pageTitle = 'Your Shared Items';
     pageDescription = 'Manage your food sharing';
     excludeOwnListings = false; // Show their own food
-    showAddButton = true;
   } else { // individual
     pageTitle = 'Food Near You';
     pageDescription = 'Discover and share food in your community';
     excludeOwnListings = true; // Show other users' food
-    showAddButton = true;
   }
 
   // Render appropriate view based on user type
@@ -89,9 +86,6 @@ const Index = () => {
       
       <FoodListingsGrid excludeOwnListings={excludeOwnListings} />
       
-      {/* Show Add Food button for individuals and organizations */}
-      {showAddButton && <AddFoodButton />}
-
       <Navbar />
     </div>
   );
