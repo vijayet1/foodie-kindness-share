@@ -20,7 +20,7 @@ const App = () => (
     <AuthProvider>
       <TooltipProvider>
         <Toaster />
-        <div className="app-background min-h-screen">
+        <div className="bg-eco-vibrant-green min-h-screen">
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
