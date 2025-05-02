@@ -98,7 +98,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen px-4 py-8">
+    <div className="min-h-screen px-4 py-8 bg-sage-50">
       {/* Logo */}
       <div className="mb-8 text-center">
         <img 
@@ -108,24 +108,24 @@ const Auth = () => {
         />
         {isForgotPassword ? (
           <>
-            <h1 className="text-2xl font-semibold mb-2 text-white">Reset Password</h1>
-            <p className="text-white/80">Enter your email to receive reset instructions</p>
+            <h1 className="text-2xl font-semibold mb-2">Reset Password</h1>
+            <p className="text-gray-600">Enter your email to receive reset instructions</p>
           </>
         ) : isLogin ? (
           <>
-            <h1 className="text-2xl font-semibold mb-2 text-white">Welcome Back</h1>
-            <p className="text-white/80">Enter your credentials to access your account</p>
+            <h1 className="text-2xl font-semibold mb-2">Welcome Back</h1>
+            <p className="text-gray-600">Enter your credentials to access your account</p>
           </>
         ) : (
           <>
-            <h1 className="text-2xl font-semibold mb-2 text-white">Create new account</h1>
-            <p className="text-white/80">Sign up to start sharing and finding food</p>
+            <h1 className="text-2xl font-semibold mb-2">Create new account</h1>
+            <p className="text-gray-600">Sign up to start sharing and finding food</p>
           </>
         )}
       </div>
 
       {/* Auth Form */}
-      <div className="max-w-sm mx-auto bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-lg">
+      <div className="max-w-sm mx-auto">
         <form onSubmit={handleAuth} className="space-y-4">
           {!isLogin && !isForgotPassword && (
             <>
