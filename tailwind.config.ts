@@ -75,8 +75,8 @@ export default {
 				},
         'eco-green': '#4CAF50',
         'eco-light-green': '#8BC34A',
-        'eco-vibrant-green': '#78A422', // New color from image
-        'eco-bg-green': '#85B82F',      // Background green from image
+        'eco-vibrant-green': '#78A422', // Updated to match image background more accurately
+        'eco-bg-green': '#78A422',      // Updated to match image background more accurately
         'sage': {
           50: '#F2FCE2',
         },
