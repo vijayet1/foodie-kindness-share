@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
 import Map from "./pages/Map";
 import WasteTracking from "./pages/WasteTracking";
+import "./App.css";
 
 const queryClient = new QueryClient();
 
@@ -19,17 +20,19 @@ const App = () => (
     <AuthProvider>
       <TooltipProvider>
         <Toaster />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/add-food" element={<AddFood />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/map" element={<Map />} />
-            <Route path="/waste-tracking" element={<WasteTracking />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <div className="app-background min-h-screen">
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/add-food" element={<AddFood />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/map" element={<Map />} />
+              <Route path="/waste-tracking" element={<WasteTracking />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </div>
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>

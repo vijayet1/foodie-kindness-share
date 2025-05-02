@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -74,6 +75,8 @@ export default {
 				},
         'eco-green': '#4CAF50',
         'eco-light-green': '#8BC34A',
+        'eco-vibrant-green': '#78A422', // New color from image
+        'eco-bg-green': '#85B82F',      // Background green from image
         'sage': {
           50: '#F2FCE2',
         },
@@ -112,7 +115,10 @@ export default {
 			},
 			fontFamily: {
 				sans: ['Inter', 'sans-serif']
-			}
+			},
+      backgroundImage: {
+        'food-sharing': "url('/lovable-uploads/c2a17c9a-6f0d-4356-b891-7eb12e9e4d0d.png')"
+      }
     }
   },
   plugins: [require("tailwindcss-animate")],
